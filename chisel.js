@@ -1,60 +1,59 @@
 class Chisel {
-  constructor(content) {
-    this.content = content;
+  constructor(markdownContent) {
+    this.markdownContent = markdownContent;
   }
 
   get parse() {
-    return this.parseContent();
+    return this.parseMarkdownContent();
   }
 
-  parseContent() {
-    var eachline = this.content.split('\n');
+  parseMarkdownContent() {
+    var eachline = this.markdownContent.split('\n');
+    var length   = this.lenght;
+
     for (var i = 0; i < eachline.length; i++)
       if (eachline[i].slice(0, 4) === "####") {
-        eachline[i] = addTextTags(4, this.length, eachline[i]);
+        eachline[i] = addTextTags(4, length, eachline[i]);
+        eachline[i] = format(eachline[i]);
       } else if (eachline[i].slice(0, 3) === "###") {
-        eachline[i] = addTextTags(3, this.length, eachline[i]);
+        eachline[i] = addTextTags(3, length, eachline[i]);
+        eachline[i] = format(eachline[i]);
       } else if (eachline[i].slice(0, 2) === "##") {
-        eachline[i] = addTextTags(2, this.length, eachline[i]);
+        eachline[i] = addTextTags(2, length, eachline[i]);
+        eachline[i] = format(eachline[i]);
       } else if (eachline[i].slice(0, 1) === "#") {
-        eachline[i] = addTextTags(1, this.length, eachline[i]);
+        eachline[i] = addTextTags(1, length, eachline[i]);
+        eachline[i] = format(eachline[i]);
       } else {
         eachline[i] = "<p>" + eachline[i].slice(0, this.length) + "</p>"; 
-        eachline[i] = formatting(eachline[i]);
+        eachline[i] = format(eachline[i]);
       }
       return eachline.join("\n");
   
-    function addTextTags(n, length, text) {
-     return "<h" + n + ">" + text.slice(n, length) + "</h" + n + ">"; 
+    function addTextTags(n, length, content) {
+     return "<h" + n + ">" + content.slice(n, length) + "</h" + n + ">"; 
     }
 
-    function formatting(text) {
-      if (text.includes("**")) {
-        text = text.split("**")
-        for (var i = 0; i < text.length - 1; i++)
-          if ( i % 2 === 0) {
-            text[i] = text[i] + "<strong>";
-          } else {
-            text[i] = text[i] + "</strong>";
-          }
-        return formatting2(text.join(""));
-      }
+    function format(content) {
+      var newContent = addFormatTags(content, "**", "strong");
+      var result     = addFormatTags(newContent, "*", "em");
+      return result;
     }
 
-    function formatting2(text) {
-      if (text.includes("*")) {
-        text = text.split("*")
-        for (var i = 0; i < text.length -1; i++)
+    function addFormatTags(content, style, tag) {
+      if (content.includes(style)) {
+        content = content.split(style)
+        for (var i = 0; i < content.length - 1; i++)
           if ( i % 2 === 0) {
-            text[i] = text[i] + "<em>";
+            content[i] = content[i] + "<" + tag + ">";
           } else {
-            text[i] = text[i] + "</em>";
-          }
-        return text.join("");
+            content[i] = content[i] + "</" + tag + ">";
+          } return content.join("");
       } else {
-        return text;
+        return content;
       }
     }
+    
   }
 }
 
